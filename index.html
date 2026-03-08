@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Norris Sasha's Mixtape | Classified</title>
+    <style>
+        :root {
+            --deep-black: #0a0a0a;
+            --vinyl-black: #121212;
+            --accent-red: #8b0000; /* Blood Red */
+            --bright-red: #ff3131;
+            --text-gray: #a0a0a0;
+            --paper-dark: #1e1e1e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--deep-black);
+            color: var(--text-gray);
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* --- Layer System --- */
+        .layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s;
+            z-index: 10;
+        }
+
+        .hidden { transform: translateY(-100%) scale(0.9); opacity: 0; pointer-events: none; }
+
+        /* --- 1. Intro: The Leather Folder --- */
+        #intro-layer {
+            background: radial-gradient(circle, #222 0%, #000 100%);
+        }
+
+        .folder {
+            width: 350px; height: 500px;
+            background: #1a1a1a;
+            border-radius: 5px 20px 20px 5px;
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.8), inset 2px 0 10px rgba(255,255,255,0.05);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; position: relative; border-left: 15px solid #111;
+            transition: transform 0.3s;
+        }
+
+        .folder:hover { transform: rotateY(-10deg) rotateX(5deg); }
+
+        .folder-seal {
+            width: 80px; height: 80px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.5);
+            font-weight: bold; color: black; font-size: 10px; text-align: center;
+        }
+
+        .folder-label {
+            margin-top: 30px; color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            padding: 5px 15px; text-transform: uppercase; letter-spacing: 3px;
+        }
+
+        /* --- 2. Password: The Decryptor --- */
+        #pass-layer { background: var(--deep-black); }
+        .decrypt-box {
+            text-align: center; border: 1px solid var(--accent-red);
+            padding: 40px; background: rgba(139, 0, 0, 0.05);
+        }
+        #pass-input {
+            background: transparent; border: none; border-bottom: 2px solid var(--accent-red);
+            color: var(--bright-red); font-size: 24px; text-align: center;
+            outline: none; width: 200px; margin: 20px 0;
+        }
+
+        /* --- 3. Main Player: The Vinyl Console --- */
+        #player-layer { 
+            background: linear-gradient(135deg, #121212 0%, #000 100%);
+            display: grid; grid-template-columns: 2fr 1fr; padding: 40px;
+        }
+
+        .deck-area {
+            display: flex; flex-direction: column; align-items: center;
+            border-right: 1px solid rgba(139, 0, 0, 0.3);
+        }
+
+        .vinyl-wrapper {
+            position: relative; width: 400px; height: 400px;
+            background: #050505; border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 50px rgba(0,0,0,1);
+        }
+
+        .vinyl-plate {
+            width: 95%; height: 95%;
+            background: repeating-radial-gradient(circle, #111, #111 2px, #181818 4px, #111 5px);
+            border-radius: 50%; position: relative;
+            transition: transform 0.1s linear;
+        }
+
+        .playing .vinyl-plate { animation: rotateVinyl 3s linear infinite; }
+
+        .vinyl-label {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 120px; height: 120px; background: var(--accent-red);
+            border-radius: 50%; border: 5px solid #111;
+            display: flex; align-items: center; justify-content: center; color: black;
+            font-weight: bold; font-size: 12px; text-align: center;
+        }
+
+        @keyframes rotateVinyl { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* Progress & Info */
+        .info-panel { width: 80%; margin-top: 40px; }
+        .song-title { color: var(--bright-red); font-size: 20px; margin-bottom: 10px; text-transform: uppercase; }
+        
+        .progress-bar {
+            width: 100%; height: 4px; background: #333; position: relative; cursor: pointer;
+        }
+        .progress-fill { width: 0%; height: 100%; background: var(--bright-red); box-shadow: 0 0 10px var(--bright-red); }
+
+        /* Sidebar Albums */
+        .album-shelf { padding: 20px; overflow-y: auto; }
+        .album-card {
+            background: #1a1a1a; margin-bottom: 20px; padding: 15px;
+            border-left: 4px solid var(--accent-red); cursor: pointer;
+            transition: 0.3s;
+        }
+        .album-card:hover { background: var(--accent-red); color: black; transform: translateX(10px); }
+        .track-item { padding: 5px 0; font-size: 13px; opacity: 0.7; cursor: pointer; }
+        .track-item:hover { opacity: 1; color: var(--bright-red); }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro-layer" class="layer">
+        <div class="folder" onclick="unlock('pass-layer')">
+            <div class="folder-seal">TOP<br>SECRET</div>
+            <div class="folder-label">Norris Sasha Mixtape</div>
+            <p style="position: absolute; bottom: 20px; font-size: 10px; opacity: 0.5;">CLICK TO DECRYPT</p>
+        </div>
+    </div>
+
+    <div id="pass-layer" class="layer hidden">
+        <div class="decrypt-box">
+            <h2 style="color: var(--accent-red);">SECURITY CHECK</h2>
+            <input type="password" id="pass-input" placeholder="ENTER CODE" onkeypress="handlePass(event)">
+            <p id="hint" style="font-size: 10px; margin-top: 10px;">HINT: THE NAME OF GIRL WHO USED TO LOVE</p>
+        </div>
+    </div>
+
+    <div id="player-layer" class="layer hidden">
+        <div class="deck-area">
+            <div id="vinyl-container" class="vinyl-wrapper">
+                <div class="vinyl-plate">
+                    <div class="vinyl-label" id="vinyl-label">NORRIS<br>SASHA</div>
+                </div>
+            </div>
+
+            <div class="info-panel">
+                <div class="song-title" id="display-title">SYSTEM READY...</div>
+                <div class="progress-bar" onclick="seek(event)">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button onclick="togglePlay()" style="background: none; border: 1px solid var(--accent-red); color: white; padding: 10px 20px; cursor: pointer;">PLAY / PAUSE</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="album-shelf">
+            <h3 style="color: var(--accent-red); margin-bottom: 20px;">ARCHIVES</h3>
+            
+            <div class="album-card">
+                <div onclick="toggleTracks('t1')">SEE YOU AROUND, SAYONARA : SORRY MA SIS (6 November 2022)</div>
+                <div id="t1" style="display:none; margin-top:10px;">
+				    <div class="track-item" onclick="playSong('Intro', 'albums/SEEYOUAROUND1/00.mp3')">Intro</div>
+                    <div class="track-item" onclick="playSong('รูปเก่าๆที่ยังเก็บไว้ (freestyle) (Prod. by Lewis Parker)', 'albums/SEEYOUAROUND1/01.mp3')">01. รูปเก่าๆที่ยังเก็บไว้ (freestyle) (Prod. by Lewis Parker)</div>
+                    <div class="track-item" onclick="playSong('Fear to meet yu at maruya (prod.jang0)', 'albums/SEEYOUAROUND1/02.mp3')">02. Fear to meet yu at maruya (prod.jang0)</div>
+					<div class="track-item" onclick="playSong('See you around, Sayonara (prod. jang0 x autrioly)', 'albums/SEEYOUAROUND1/03.mp3')">03. See you around, Sayonara (prod. jang0 x autrioly)</div>
+                    <div class="track-item" onclick="playSong('Hard 2 Say (prod. JTM)', 'albums/SEEYOUAROUND1/04.mp3')">04. Hard 2 Say (prod. JTM)</div>
+					<div class="track-item" onclick="playSong('ยู (Prod. level)', 'albums/SEEYOUAROUND1/05.mp3')">05. ยู (Prod. level)</div>
+                    <div class="track-item" onclick="playSong('different time. (Prod. ETA)', 'albums/SEEYOUAROUND1/06.mp3')">06. different time. (Prod. ETA)</div>
+					<div class="track-item" onclick="playSong('[Bonus Track] รักพี่นะ (แต่พี่คงไม่รัก) (Prod. Underwood Beats) (2021)', 'albums/SEEYOUAROUND1/07.mp4')">07. [Bonus Track] รักพี่นะ (แต่พี่คงไม่รัก) (Prod. Underwood Beats) (2021)</div>
+                    <div class="track-item" onclick="playSong('[Bonus Track] ก่อนไปแต่งงานกับเขา (2021)', 'albums/SEEYOUAROUND1/08.mp3')">08. [Bonus Track] ก่อนไปแต่งงานกับเขา (2021)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const audio = new Audio();
+        let isPlaying = false;
+
+        // Navigation
+        function unlock(nextLayer) {
+            document.querySelector('.layer:not(.hidden)').classList.add('hidden');
+            document.getElementById(nextLayer).classList.remove('hidden');
+        }
+
+        function handlePass(e) {
+            if(e.key === 'Enter') {
+                if(document.getElementById('pass-input').value.toLowerCase() === 'miyudesu') {
+                    unlock('player-layer');
+                } else {
+                    alert('ACCESS DENIED');
+                }
+            }
+        }
+
+        // Player Logic
+        function toggleTracks(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function playSong(name, file) {
+            document.getElementById('display-title').innerText = name;
+            document.getElementById('vinyl-label').innerText = name.substring(0, 10);
+            audio.src = file;
+            audio.play();
+            isPlaying = true;
+            document.getElementById('vinyl-container').classList.add('playing');
+        }
+
+        function togglePlay() {
+            if(!audio.src) return;
+            if(isPlaying) {
+                audio.pause();
+                document.getElementById('vinyl-container').classList.remove('playing');
+            } else {
+                audio.play();
+                document.getElementById('vinyl-container').classList.add('playing');
+            }
+            isPlaying = !isPlaying;
+        }
+
+        audio.ontimeupdate = () => {
+            const percent = (audio.currentTime / audio.duration) * 100;
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        function seek(e) {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            audio.currentTime = (x / rect.width) * audio.duration;
+        }
+    </script>
+</body>
+</html>
