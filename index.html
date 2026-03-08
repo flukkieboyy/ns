@@ -252,6 +252,40 @@
             const x = e.clientX - rect.left;
             audio.currentTime = (x / rect.width) * audio.duration;
         }
+		
+			
+		// ปิดคลิกขวา
+	document.addEventListener("contextmenu", function(e) {
+		e.preventDefault();
+	});
+
+	// ปิดปุ่ม DevTools ต่างๆ
+	document.addEventListener("keydown", function(e) {
+
+    // F12
+    if (e.key === "F12") {
+        e.preventDefault();
+        window.location.href = "https://google.com"; // เด้งไปหน้าอื่น
+    }
+
+    // Ctrl+Shift+I
+    if (e.ctrlKey && e.shiftKey && e.key === "I") {
+        e.preventDefault();
+        window.location.href = "https://google.com";
+    }
+
+    // Ctrl+Shift+J
+    if (e.ctrlKey && e.shiftKey && e.key === "J") {
+        e.preventDefault();
+        window.location.href = "https://google.com";
+    }
+
+    // Ctrl+U (ดู source)
+    if (e.ctrlKey && e.key === "u") {
+        e.preventDefault();
+        window.location.href = "https://google.com";
+    }
+});
     </script>
 </body>
 </html>
